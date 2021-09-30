@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	models "github.com/KanybekMomukeyev/imgdatabase/models"
+	models "github.com/KanybekMomukeyev/imgdatabase/v3/models"
 
 	log "github.com/sirupsen/logrus"
 )

@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	models "github.com/KanybekMomukeyev/imgdatabase/models"
-	dbmodels "github.com/KanybekMomukeyev/imgdatabase/models/dbmodels"
+	models "github.com/KanybekMomukeyev/imgdatabase/v3/models"
+	dbmodels "github.com/KanybekMomukeyev/imgdatabase/v3/models/dbmodels"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )

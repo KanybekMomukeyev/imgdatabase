@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	dbmodels "github.com/KanybekMomukeyev/imgdatabase/models/dbmodels"
+	dbmodels "github.com/KanybekMomukeyev/imgdatabase/v3/models/dbmodels"
 	"github.com/stretchr/testify/assert"
 )
 
