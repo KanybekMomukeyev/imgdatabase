@@ -1,4 +1,4 @@
-module github.com/KanybekMomukeyev/imgdatabase
+module github.com/KanybekMomukeyev/imgdatabase/v2
 
 go 1.16
 
