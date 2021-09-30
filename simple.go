@@ -9,6 +9,7 @@ import (
 
 // Preprocess returns preprocessed text
 func Preprocess() []string {
+	// comment here
 	tk := pretrained.BertBaseUncased()
 
 	sentence := `The quick brown fox jumps over the [L A Z Y D O G]`
