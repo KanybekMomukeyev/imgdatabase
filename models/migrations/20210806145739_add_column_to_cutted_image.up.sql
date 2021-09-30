@@ -1,0 +1,1 @@
+ALTER TABLE cutted_images ADD COLUMN IF NOT EXISTS cutted_image_state INTEGER DEFAULT 1000;

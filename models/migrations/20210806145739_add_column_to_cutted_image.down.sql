@@ -1,0 +1,1 @@
+ALTER TABLE cutted_images DROP COLUMN IF EXISTS cutted_image_state;

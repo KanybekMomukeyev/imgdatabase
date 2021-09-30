@@ -1,4 +1,4 @@
-package go_simple_module
+package imgdatabase
 
 import (
 	"fmt"
