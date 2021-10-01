@@ -819,12 +819,7 @@ func (dbM *DbManager) AllUpdatedTelegramUsers(suppFilter *dbmodels.TelegramUserF
 
 // ------------------------------------------------------------------------------------------------- //
 var schemaDROP = `
-DROP TABLE IF EXISTS cutted_image_translates;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS telegram_users;
-DROP TABLE IF EXISTS folders;
-DROP TABLE IF EXISTS cutted_images;
-DROP TABLE IF EXISTS schema_migrations;
+DROP TABLE IF EXISTS some_unknown_table;
 `
 
 var schema = `
@@ -854,6 +849,7 @@ type Place struct {
 
 func (dbM *DbManager) DropAllTables() {
 	dbM.DB.MustExec(schemaDROP)
+	dbM.DB.MustExec(schema)
 }
 
 func (dbM *DbManager) TestSqlxDatabaseConnection() {
