@@ -70,10 +70,10 @@ func (p *Person) CreateMessage() {
 	//p.RusMessage = fakeText
 	//p.KgMessage = ""
 
-	rusText := fmt.Sprintf("Уважаемый/ая %s! Дос-Кредобанк напоминает о погашении кредита до %v, к оплате %.2f сом. Лицевой счет № %s. Погасить можно во всех отделениях Банка, терминалах, мобильных кошельках. Тел.: 8686.", p.NameSurname, p.DateValue().Format("2006-01-02"), p.FloatValue(), p.Account)
+	rusText := fmt.Sprintf("Уважаемый/ая %s! напоминает о погашении кредита до %v, к оплате %.2f сом. Лицевой счет № %s. Погасить можно во всех отделениях Банка, терминалах, мобильных кошельках. Тел.: 8686.", p.NameSurname, p.DateValue().Format("2006-01-02"), p.FloatValue(), p.Account)
 	p.RusMessage = rusText
 
-	kgText := fmt.Sprintf("Урматтуу %s! Дос-Кредобанк эскертет: кредитти %v чейин төлөөңүз. Төлөө суммасы %.2f сом. Сиздин жеке эсеп № %s. Банктын бөлүмдөрү, терминалдары, мобилдик капчыктары аркылуу төлөө мүмкүн. Тел.: 8686", p.NameSurname, p.DateValue().Format("2006-01-02"), p.FloatValue(), p.Account)
+	kgText := fmt.Sprintf("Урматтуу %s! эскертет: кредитти %v чейин төлөөңүз. Төлөө суммасы %.2f сом. Сиздин жеке эсеп № %s. Банктын бөлүмдөрү, терминалдары, мобилдик капчыктары аркылуу төлөө мүмкүн. Тел.: 8686", p.NameSurname, p.DateValue().Format("2006-01-02"), p.FloatValue(), p.Account)
 	p.KgMessage = kgText
 }
 
