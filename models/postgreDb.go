@@ -735,6 +735,83 @@ func (dbM *DbManager) CreateSampleTelegramUsersIfNotExsist() {
 	}
 }
 
+func (dbM *DbManager) CreateUsersIfNotExsist() {
+	// 5 sample user for test lets create
+	// 1. Пользователь1 // 14c25048-b901-461f-934d-1adefb083912
+	// 2. Пользователь2 // 56999956-47b6-442a-941e-6b3d548e6174
+	// 3. Пользователь3 // 0b82413e-9ffb-4f10-bf59-a89840e476e1
+	// 4. Пользователь4 // ee5a8e61-4b1c-46c3-8bee-2312f8b053e2
+	// 5. Пользователь5 // 8551fdc5-e87a-4a68-a536-7938fee5b623
+	user1, _ := dbM.UserForUUID("14c25048-b901-461f-934d-1adefb083912")
+	if user1 == nil {
+		userModel1 := new(dbmodels.UserRequest)
+		userModel1.UserUUID = "14c25048-b901-461f-934d-1adefb083912"
+		userModel1.UserType = uint32(dbmodels.USER_TYPE_OWNER)
+		userModel1.CompanyId = uint64(1)
+		userModel1.StockId = uint64(1)
+		userModel1.UserImagePath = "UserImagePath1"
+		userModel1.FirstName = "Пользователь1"
+		userModel1.SecondName = "SecondName1"
+		userModel1.Email = "Email1@gmail.com"
+		userModel1.Password = "password1"
+		userModel1.PhoneNumber = "PhoneNumber1"
+		userModel1.Address = "Address1"
+		storedUserID1, err := dbM.CreateUser(userModel1)
+		if err != nil {
+			panic("Create user")
+		} else {
+			idString := fmt.Sprintf("Database stored userID = %d", storedUserID1)
+			dbM.providerLogs.WithFields(log.Fields{"Database ceated user": idString}).Info("CreateUsersIfNotExsist")
+		}
+	}
+
+	user2, _ := dbM.UserForUUID("0b82413e-9ffb-4f10-bf59-a89840e476e1")
+	if user2 == nil {
+		userModel2 := new(dbmodels.UserRequest)
+		userModel2.UserUUID = "0b82413e-9ffb-4f10-bf59-a89840e476e1"
+		userModel2.UserType = uint32(dbmodels.USER_TYPE_ADMIN)
+		userModel2.CompanyId = uint64(1)
+		userModel2.StockId = uint64(1)
+		userModel2.UserImagePath = "UserImagePath2"
+		userModel2.FirstName = "Пользователь2"
+		userModel2.SecondName = "SecondName2"
+		userModel2.Email = "Email2@gmail.com"
+		userModel2.Password = "password2"
+		userModel2.PhoneNumber = "PhoneNumber2"
+		userModel2.Address = "Address2"
+		storedUserID2, err := dbM.CreateUser(userModel2)
+		if err != nil {
+			panic("Create user")
+		} else {
+			idString := fmt.Sprintf("Database stored userID = %d", storedUserID2)
+			dbM.providerLogs.WithFields(log.Fields{"Database ceated user": idString}).Info("CreateUsersIfNotExsist")
+		}
+	}
+
+	user3, _ := dbM.UserForUUID("56999956-47b6-442a-941e-6b3d548e6174")
+	if user3 == nil {
+		userModel3 := new(dbmodels.UserRequest)
+		userModel3.UserUUID = "56999956-47b6-442a-941e-6b3d548e6174"
+		userModel3.UserType = uint32(dbmodels.USER_TYPE_CAN_ADD_DOC)
+		userModel3.CompanyId = uint64(1)
+		userModel3.StockId = uint64(1)
+		userModel3.UserImagePath = "UserImagePath3"
+		userModel3.FirstName = "Пользователь3"
+		userModel3.SecondName = "SecondName3"
+		userModel3.Email = "Email3@gmail.com"
+		userModel3.Password = "password3"
+		userModel3.PhoneNumber = "PhoneNumber3"
+		userModel3.Address = "Address3"
+		storedUserID3, err := dbM.CreateUser(userModel3)
+		if err != nil {
+			panic("Create user")
+		} else {
+			idString := fmt.Sprintf("Database stored userID = %d", storedUserID3)
+			dbM.providerLogs.WithFields(log.Fields{"Database ceated user": idString}).Info("CreateUsersIfNotExsist")
+		}
+	}
+}
+
 func (dbM *DbManager) CreateTelegramUser(telegramUser *dbmodels.TelegramUser, companyId uint64) (uint64, error) {
 	f := func() {
 		tx := dbM.DB.MustBegin()

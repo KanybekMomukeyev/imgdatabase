@@ -29,6 +29,13 @@ type UserRequest struct {
 	ActiveUser    uint32 `protobuf:"varint,13,opt,name=activeUser" json:"activeUser"`
 }
 
+const (
+	USER_TYPE_ADMIN       AcceptStatus = 11000
+	USER_TYPE_SIMPLE      AcceptStatus = 55000
+	USER_TYPE_OWNER       AcceptStatus = 88000
+	USER_TYPE_CAN_ADD_DOC AcceptStatus = 66000
+)
+
 // CREATE TABLE IF NOT EXISTS users (
 //     user_id BIGSERIAL PRIMARY KEY NOT NULL,
 //     user_uuid VARCHAR (400) UNIQUE,
