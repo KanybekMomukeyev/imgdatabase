@@ -57,7 +57,6 @@ func UpdatedAt() uint64 {
 
 func ErrorFunc(err error) (uint64, error) {
 	log.WithFields(log.Fields{"error": err}).Fatal("SQLX QueryRow breaks")
-	panic(err)
 	return 0, err
 }
 
@@ -250,11 +249,14 @@ func UserForEmail(db *sqlx.DB, email string) (*UserRequest, error) {
 	}
 
 	users, err := scanUserRow(rows)
+	if err != nil {
+		return nil, err
+	}
 	if len(users) > 0 {
 		return users[0], nil
 	}
 
-	return nil, errors.New("No such user for email")
+	return nil, errors.New("no such user for email")
 }
 
 func UserForUUID(db *sqlx.DB, uuid string) (*UserRequest, error) {
@@ -268,9 +270,12 @@ func UserForUUID(db *sqlx.DB, uuid string) (*UserRequest, error) {
 	}
 
 	users, err := scanUserRow(rows)
+	if err != nil {
+		return nil, err
+	}
 	if len(users) > 0 {
 		return users[0], nil
 	}
 
-	return nil, errors.New("No such user for uuid")
+	return nil, errors.New("no such user for uuid")
 }
