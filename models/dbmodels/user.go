@@ -246,16 +246,15 @@ func UserForEmail(db *sqlx.DB, email string) (*UserRequest, error) {
 		"FROM users WHERE email=$1", email)
 
 	if err != nil {
-		print("error")
+		return nil, err
 	}
 
 	users, err := scanUserRow(rows)
-
 	if len(users) > 0 {
 		return users[0], nil
 	}
 
-	return nil, nil
+	return nil, errors.New("No such user for email")
 }
 
 func UserForUUID(db *sqlx.DB, uuid string) (*UserRequest, error) {
@@ -265,14 +264,13 @@ func UserForUUID(db *sqlx.DB, uuid string) (*UserRequest, error) {
 		"FROM users WHERE user_uuid = $1", uuid)
 
 	if err != nil {
-		print("error")
+		return nil, err
 	}
 
 	users, err := scanUserRow(rows)
-
 	if len(users) > 0 {
 		return users[0], nil
 	}
 
-	return nil, errors.New("No such user")
+	return nil, errors.New("No such user for uuid")
 }
