@@ -21,6 +21,7 @@ type CuttedImageTranslate struct {
 	Comments               string `db:"comments" json:"comments"`
 	Summary                string `db:"summary" json:"summary"`
 	AcceptStatus           uint32 `db:"accept_status" json:"accept_status"`
+	UserID                 uint64 `db:"user_id" json:"user_id"`
 	UpdatedAt              uint64 `db:"updated_at"  json:"updated_at"`
 }
 
@@ -55,6 +56,7 @@ const (
 //     summary varchar (400),
 //     accept_status INTEGER,
 //     updated_at BIGINT,
+//     user_id BIGINT,
 // );
 
 // CREATE INDEX IF NOT EXISTS cutted_image_id_cutted_image_translates_idx ON cutted_image_translates (cutted_image_id);
@@ -71,6 +73,7 @@ var selectCuttedImageTranslateRow string = "cutted_image_translate_id, " +
 	"comments, " +
 	"summary, " +
 	"updated_at, " +
+	"user_id, " +
 	"accept_status "
 
 func scanCuttedImageTranslateRow(rows *sqlx.Rows) ([]*CuttedImageTranslate, error) {
@@ -85,6 +88,7 @@ func scanCuttedImageTranslateRow(rows *sqlx.Rows) ([]*CuttedImageTranslate, erro
 			&cuttedImageTranslate.Comments,
 			&cuttedImageTranslate.Summary,
 			&cuttedImageTranslate.UpdatedAt,
+			&cuttedImageTranslate.UserID,
 			&cuttedImageTranslate.AcceptStatus)
 
 		if err != nil {
@@ -107,7 +111,8 @@ func StoreCuttedImageTranslate(tx *sqlx.Tx, cuttedImageTranslate *CuttedImageTra
 		"summary, "+
 		"accept_status, "+
 		"tsv, "+
-		"updated_at) VALUES($1, $2, $3, $4, $5, $6, to_tsvector($7), $8) returning cutted_image_translate_id;",
+		"user_id, "+
+		"updated_at) VALUES($1, $2, $3, $4, $5, $6, to_tsvector($7), $8, $9) returning cutted_image_translate_id;",
 		cuttedImageTranslate.CuttedImageID,
 		cuttedImageTranslate.TelegramUserID,
 		cuttedImageTranslate.TranslatedWord,
@@ -115,6 +120,7 @@ func StoreCuttedImageTranslate(tx *sqlx.Tx, cuttedImageTranslate *CuttedImageTra
 		cuttedImageTranslate.Summary,
 		cuttedImageTranslate.AcceptStatus,
 		strings.ToLower(cuttedImageTranslate.TranslatedWord),
+		cuttedImageTranslate.UserID,
 		UpdatedAt(),
 	).Scan(&lastInsertId)
 
@@ -155,8 +161,9 @@ func UpdateCuttedImageTranslate(tx *sqlx.Tx, cuttedImageTranslate *CuttedImageTr
 		"comments=$4, " +
 		"summary=$5, " +
 		"accept_status=$6, " +
-		"updated_at=$7 " +
-		"WHERE cutted_image_translate_id=$8")
+		"user_id=$7, " +
+		"updated_at=$8 " +
+		"WHERE cutted_image_translate_id=$9")
 
 	if err != nil {
 		return ErrorFunc(err)
@@ -169,6 +176,7 @@ func UpdateCuttedImageTranslate(tx *sqlx.Tx, cuttedImageTranslate *CuttedImageTr
 		cuttedImageTranslate.Comments,
 		cuttedImageTranslate.Summary,
 		cuttedImageTranslate.AcceptStatus,
+		cuttedImageTranslate.UserID,
 		UpdatedAt(),
 		cuttedImageTranslate.CuttedImageTranslateID,
 	)
@@ -260,11 +268,12 @@ type CustomTranslate struct {
 	AcceptStatus           uint32 `json:"accept_status"`
 	ParsedImagePath        string `json:"parsed_image_path"`
 	UpdatedAt              uint64 `json:"updated_at"`
+	UserID                 uint64 `json:"user_id"`
 }
 
 func TranslatesForDocModelAndAcceptedStatus(db *sqlx.DB, docModelID uint64, translateStatus AcceptStatus) ([]*CustomTranslate, error) {
 
-	uniqTelegramUserIDs := `select d.cutted_image_translate_id, d.cutted_image_id, d.telegram_user_id, d.translated_word, d.accept_status, c.parsed_image_path, d.updated_at 
+	uniqTelegramUserIDs := `select d.cutted_image_translate_id, d.cutted_image_id, d.telegram_user_id, d.translated_word, d.accept_status, c.parsed_image_path, d.updated_at, d.user_id 
 	from cutted_images as c
 	join cutted_image_translates as d on
 	c.image_id = d.cutted_image_id 
@@ -287,7 +296,8 @@ func TranslatesForDocModelAndAcceptedStatus(db *sqlx.DB, docModelID uint64, tran
 			&customTranslate.TranslatedWord,
 			&customTranslate.AcceptStatus,
 			&customTranslate.ParsedImagePath,
-			&customTranslate.UpdatedAt)
+			&customTranslate.UpdatedAt,
+			&customTranslate.UserID)
 
 		if err != nil {
 			log.WithFields(log.Fields{"error": err}).Warn("")
@@ -300,7 +310,7 @@ func TranslatesForDocModelAndAcceptedStatus(db *sqlx.DB, docModelID uint64, tran
 
 func TranslatesForDocModelAndTelegramUser(db *sqlx.DB, docModelID uint64, telegramUserID uint64) ([]*CustomTranslate, error) {
 
-	uniqTelegramUserIDs := `select d.cutted_image_translate_id, d.cutted_image_id, d.telegram_user_id, d.translated_word, d.accept_status, c.parsed_image_path, d.updated_at 
+	uniqTelegramUserIDs := `select d.cutted_image_translate_id, d.cutted_image_id, d.telegram_user_id, d.translated_word, d.accept_status, c.parsed_image_path, d.updated_at, d.user_id 
 	from cutted_images as c
 	join cutted_image_translates as d on
 	c.image_id = d.cutted_image_id 
@@ -323,7 +333,8 @@ func TranslatesForDocModelAndTelegramUser(db *sqlx.DB, docModelID uint64, telegr
 			&customTranslate.TranslatedWord,
 			&customTranslate.AcceptStatus,
 			&customTranslate.ParsedImagePath,
-			&customTranslate.UpdatedAt)
+			&customTranslate.UpdatedAt,
+			&customTranslate.UserID)
 
 		if err != nil {
 			log.WithFields(log.Fields{"error": err}).Warn("")

@@ -17,17 +17,18 @@ func init() {
 	providerLogs.SetOutput(os.Stdout)
 	providerLogs.SetLevel(log.InfoLevel)
 
-	log.Println("START MIGRATIONS")
+	log.Printf("\nSTART MIGRATIONS\n")
 	models.MigrateDatabaseDown(models.TestPath, "file://../migrations/")
 	models.MigrateDatabaseUp(models.TestPath, "file://../migrations/")
-	log.Println("MIGRATIONS FINISHED")
+	log.Printf("\nMIGRATIONS FINISHED\n")
+
 	DbMng = models.NewDbManager(models.TestPath, providerLogs)
 }
 
 func TestMain(m *testing.M) {
-	log.Println("This gets run BEFORE any tests get run!")
+	log.Printf("\n START TEST -V This gets run BEFORE any tests get run!\n")
 	exitVal := m.Run()
-	log.Println("This gets run AFTER any tests get run!")
+	log.Printf("\n END TEST -V This gets run AFTER any tests get run!\n")
 	os.Exit(exitVal)
 }
 

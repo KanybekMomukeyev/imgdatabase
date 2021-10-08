@@ -16,6 +16,8 @@ import (
 // 	Comments               string `db:"comments" json:"comments"`
 // 	Summary                string `db:"summary" json:"summary"`
 // 	AcceptStatus           uint32 `db:"accept_status" json:"accept_status"`
+// 	UserID                 uint64 `db:"user_id" json:"user_id"`
+// 	UpdatedAt              uint64 `db:"updated_at"  json:"updated_at"`
 // }
 
 func TestCreateCuttedImageTranslate(t *testing.T) {
@@ -28,6 +30,7 @@ func TestCreateCuttedImageTranslate(t *testing.T) {
 	cuttedimagetranslate.Comments = "CommentsCommentsComments"
 	cuttedimagetranslate.Summary = "SummarySummarySummary"
 	cuttedimagetranslate.AcceptStatus = uint32(1200)
+	cuttedimagetranslate.UserID = uint64(12497898673234)
 
 	cuttedimageId, err := DbMng.CreateCuttedImageTranslate(cuttedimagetranslate)
 
@@ -48,6 +51,7 @@ func TestCreateCuttedImageTranslate(t *testing.T) {
 		assert.Equal(t, cuttedImageTranslate.Comments, "CommentsCommentsComments", "Comments")
 		assert.Equal(t, cuttedImageTranslate.Summary, "SummarySummarySummary", "CategoryName")
 		assert.Equal(t, cuttedImageTranslate.AcceptStatus, uint32(1200), "CategoryName")
+		assert.Equal(t, cuttedImageTranslate.UserID, uint64(12497898673234), "CategoryName")
 	}
 
 	respAffected, _ := DbMng.AutoMigrateTranslates()
@@ -73,6 +77,7 @@ func TestUpdateCuttedImageTranslate(t *testing.T) {
 	cuttedimagetranslate.Comments = "CommentsCommentsComments33333"
 	cuttedimagetranslate.Summary = "SummarySummarySummary44444"
 	cuttedimagetranslate.AcceptStatus = uint32(4200)
+	cuttedimagetranslate.UserID = uint64(7898673234)
 
 	rowsAffected, err := DbMng.UpdateCuttedImageTranslate(cuttedimagetranslate)
 	assert.NotEqual(t, 0, rowsAffected, "userId  should not be equal to zero")
@@ -89,7 +94,12 @@ func TestUpdateCuttedImageTranslate(t *testing.T) {
 		assert.Equal(t, cuttedImageTranslate.Comments, "CommentsCommentsComments33333", "CategoryName")
 		assert.Equal(t, cuttedImageTranslate.Summary, "SummarySummarySummary44444", "CategoryName")
 		assert.Equal(t, cuttedImageTranslate.AcceptStatus, uint32(4200), "CategoryName")
+		assert.Equal(t, cuttedImageTranslate.UserID, uint64(7898673234), "UserID")
 	}
+
+	translates, err := DbMng.TranslatesForSearchKeyword("Wor")
+	fmt.Printf("\n\n len(translates): %d \n\n", len(translates))
+	assert.NotEqual(t, 0, len(translates), "translates.count should not be equal to zero")
 
 	assert.Nil(t, err, "error should be nil")
 	if assert.NotNil(t, cuttedImageTranslates) {
