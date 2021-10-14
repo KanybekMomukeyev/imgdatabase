@@ -12,22 +12,10 @@ type ImageFilter struct {
 	CustomerUpdatedAt uint64 `protobuf:"varint,2,opt,name=customerUpdatedAt,proto3" json:"customerUpdatedAt"`
 }
 
-// type Cuttedimage struct {
-// 	ImageID         int            `db:"image_id"  json:"imageId"`
-// 	DocModelID      sql.NullInt64  `db:"docmodel_id"  json:"DocModelID"`
-// 	CompanyID       sql.NullInt64  `db:"company_id"  json:"companyId"`
-// 	FolderID        sql.NullInt64  `db:"folder_id"  json:"folder_id"`
-// 	ParsedImagePath sql.NullString `db:"parsed_image_path"  json:"parsedImagePath"`
-// 	FolderName      sql.NullString `db:"folder_name"  json:"folderName"`
-// 	SecondName      sql.NullString `db:"second_name"  json:"secondName"`
-// 	PhoneNumber     sql.NullString `db:"phone_number"  json:"phoneNumber"`
-// 	Address         sql.NullString `db:"address"  json:"address"`
-// 	UpdatedAt       sql.NullInt64  `db:"updated_at"  json:"updatedAt"`
-// }
-
 type CuttedImage struct {
 	CuttedImageID    uint64 `db:"image_id"  json:"image_id"`
 	CuttedImageState uint32 `db:"cutted_image_state" json:"cutted_image_state"` // DEFAULT VALUE 1000
+	CuttedImageType  uint32 `db:"cutted_image_type" json:"cutted_image_type"`   // DEFAULT VALUE 101010
 	DocModelID       uint64 `db:"docmodel_id"  json:"docmodel_id"`
 	CompanyID        uint64 `db:"company_id"  json:"company_id"`
 	FolderID         uint64 `db:"folder_id"  json:"folder_id"`
@@ -37,7 +25,6 @@ type CuttedImage struct {
 	PhoneNumber      string `db:"phone_number"  json:"phone_number"`
 	Address          string `db:"address"  json:"address"`
 	UpdatedAt        uint64 `db:"updated_at"  json:"updated_at"`
-	WaitingCount     int    `json:"waiting_count"` // NOT IN DATABASE
 }
 
 type CuttedImageState uint32
@@ -47,6 +34,14 @@ const (
 	CUTTED_IMAGE_TRANSLATED     CuttedImageState = 3000
 	CUTTED_IMAGE_MISSTAKED      CuttedImageState = 5000
 	CUTTED_IMAGE_MARKED_INVALID CuttedImageState = 9000
+)
+
+type CuttedImageType uint32
+
+const (
+	TYPE_CUTTED_IMAGE_UNKNOWN     CuttedImageType = 101010
+	TYPE_CUTTED_IMAGE_HANDWRITTEN CuttedImageType = 303030
+	TYPE_CUTTED_IMAGE_COMPUTER    CuttedImageType = 505050
 )
 
 // CREATE TABLE IF NOT EXISTS cutted_images (
@@ -61,6 +56,7 @@ const (
 //     phone_number varchar (500),
 //     address varchar (500),
 //     updated_at BIGINT
+//     cutted_image_type INTEGER DEFAULT 101010
 // );
 
 // CREATE INDEX IF NOT EXISTS company_id_cuttedimages_idx ON cutted_images (company_id);
@@ -80,7 +76,8 @@ func StoreCuttedImage(tx *sqlx.Tx, imageRequest *CuttedImage, companyId uint64) 
 		"phone_number, "+
 		"address, "+
 		"updated_at, "+
-		"cutted_image_state) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning image_id;",
+		"cutted_image_type, "+
+		"cutted_image_state) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning image_id;",
 		imageRequest.DocModelID,
 		companyId,
 		imageRequest.FolderID,
@@ -90,6 +87,7 @@ func StoreCuttedImage(tx *sqlx.Tx, imageRequest *CuttedImage, companyId uint64) 
 		imageRequest.PhoneNumber,
 		imageRequest.Address,
 		UpdatedAt(),
+		imageRequest.CuttedImageType,
 		imageRequest.CuttedImageState,
 	).Scan(&lastInsertId)
 
@@ -112,8 +110,9 @@ func UpdateCuttedImage(tx *sqlx.Tx, imageRequest *CuttedImage, companyId uint64)
 		"phone_number=$7, " +
 		"address=$8, " +
 		"updated_at=$9, " +
-		"cutted_image_state=$10 " +
-		"WHERE image_id=$11")
+		"cutted_image_type=$10, " +
+		"cutted_image_state=$11 " +
+		"WHERE image_id=$12")
 
 	if err != nil {
 		return ErrorFunc(err)
@@ -129,6 +128,7 @@ func UpdateCuttedImage(tx *sqlx.Tx, imageRequest *CuttedImage, companyId uint64)
 		imageRequest.PhoneNumber,
 		imageRequest.Address,
 		UpdatedAt(),
+		imageRequest.CuttedImageType,
 		imageRequest.CuttedImageState,
 		imageRequest.CuttedImageID,
 	)
@@ -147,13 +147,42 @@ func UpdateCuttedImage(tx *sqlx.Tx, imageRequest *CuttedImage, companyId uint64)
 
 var selectCuttedImageRow string = "image_id, " +
 	"docmodel_id, " +
+	"company_id, " +
 	"folder_id, " +
 	"parsed_image_path, " +
 	"folder_name, " +
 	"second_name, " +
 	"phone_number, " +
 	"address, " +
+	"cutted_image_type, " +
 	"cutted_image_state "
+
+func scanCuttedImageRow(rows *sqlx.Rows) ([]*CuttedImage, error) {
+	customers := make([]*CuttedImage, 0)
+	for rows.Next() {
+		customer := new(CuttedImage)
+		err := rows.Scan(
+			&customer.CuttedImageID,
+			&customer.DocModelID,
+			&customer.CompanyID,
+			&customer.FolderID,
+			&customer.ParsedImagePath,
+			&customer.FolderName,
+			&customer.SecondName,
+			&customer.PhoneNumber,
+			&customer.Address,
+			&customer.CuttedImageType,
+			&customer.CuttedImageState,
+		)
+
+		if err != nil {
+			log.WithFields(log.Fields{"error": err}).Warn("")
+			return nil, err
+		}
+		customers = append(customers, customer)
+	}
+	return customers, nil
+}
 
 func AllCuttedImagesForCompany(db *sqlx.DB, companyId uint64) ([]*CuttedImage, error) {
 
@@ -287,21 +316,17 @@ func RandomNotTranslatedCuttedImageNOT_IN_ARRAY(db *sqlx.DB, imageIDs []uint64) 
 	}
 }
 
-func RandomNotTranslatedCuttedImage__NOT_USED(db *sqlx.DB, companyID uint64, imageIDs []uint64) (*CuttedImage, error) {
-	// SELECT column FROM table ORDER BY RANDOM() LIMIT 1
+func RandomUnknownType(db *sqlx.DB) (*CuttedImage, error) {
 
 	rows, err := db.Queryx("SELECT "+
 		selectCuttedImageRow+
-		"FROM cutted_images WHERE cutted_image_state=$1 ORDER BY RANDOM() LIMIT 1", uint32(CUTTED_IMAGE_NOT_TRANSLATED))
-
-	// rows, err := db.Queryx("SELECT " +
-	// 	selectCuttedImageRow +
-	// 	"FROM cutted_images WHERE cutted_image_state = 1000 ORDER BY RANDOM() LIMIT 1")
+		"FROM cutted_images WHERE cutted_image_type=$1 ORDER BY RANDOM() LIMIT 1", uint32(TYPE_CUTTED_IMAGE_UNKNOWN))
 
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warn("")
 		return nil, err
 	}
+
 	cuttedImages, err := scanCuttedImageRow(rows)
 	if err != nil {
 		return nil, err
@@ -310,33 +335,8 @@ func RandomNotTranslatedCuttedImage__NOT_USED(db *sqlx.DB, companyID uint64, ima
 	if len(cuttedImages) > 0 {
 		return cuttedImages[len(cuttedImages)-1], nil
 	} else {
-		return nil, nil
+		return nil, errors.New("EMPTY")
 	}
-}
-
-func scanCuttedImageRow(rows *sqlx.Rows) ([]*CuttedImage, error) {
-	customers := make([]*CuttedImage, 0)
-	for rows.Next() {
-		customer := new(CuttedImage)
-		err := rows.Scan(
-			&customer.CuttedImageID,
-			&customer.DocModelID,
-			&customer.FolderID,
-			&customer.ParsedImagePath,
-			&customer.FolderName,
-			&customer.SecondName,
-			&customer.PhoneNumber,
-			&customer.Address,
-			&customer.CuttedImageState,
-		)
-
-		if err != nil {
-			log.WithFields(log.Fields{"error": err}).Warn("")
-			return nil, err
-		}
-		customers = append(customers, customer)
-	}
-	return customers, nil
 }
 
 func AllUpdatedCuttedImages(db *sqlx.DB, custFilter *ImageFilter, companyId uint64) ([]*CuttedImage, error) {

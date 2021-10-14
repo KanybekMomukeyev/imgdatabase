@@ -302,6 +302,14 @@ func (dbM *DbManager) RandomNotTranslatedCuttedImageNOT_IN_ARRAY(imageIDs []uint
 	return randomCuttedImage, nil
 }
 
+func (dbM *DbManager) RandomUnknownType() (*dbmodels.CuttedImage, error) {
+	randomCuttedImage, err := dbmodels.RandomUnknownType(dbM.DB)
+	if err != nil {
+		return nil, err
+	}
+	return randomCuttedImage, nil
+}
+
 func (dbM *DbManager) AllUpdatedCuttedImages(custFilter *dbmodels.ImageFilter, companyId uint64) ([]*dbmodels.CuttedImage, error) {
 	customers, err := dbmodels.AllUpdatedCuttedImages(dbM.DB, custFilter, companyId)
 	if err != nil {

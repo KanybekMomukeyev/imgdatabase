@@ -136,6 +136,7 @@ func UpdateFolderModel(tx *sqlx.Tx, folderRequest *FolderModel, companyId uint64
 
 var selectFolderModelRow string = "folder_id, " +
 	"docmodel_id, " +
+	"company_id, " +
 	"word_count, " +
 	"parsed_image_count, " +
 	"folder_image_path, " +
@@ -151,6 +152,7 @@ func scanFolderModelRows(rows *sqlx.Rows) ([]*FolderModel, error) {
 		err := rows.Scan(
 			&supplier.FolderID,
 			&supplier.DocmodelID,
+			&supplier.CompanyID,
 			&supplier.WordCount,
 			&supplier.ParsedImageCount,
 			&supplier.FolderImagePath,
