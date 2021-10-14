@@ -25,6 +25,7 @@ type CuttedImage struct {
 	PhoneNumber      string `db:"phone_number"  json:"phone_number"`
 	Address          string `db:"address"  json:"address"`
 	UpdatedAt        uint64 `db:"updated_at"  json:"updated_at"`
+	WaitingCount     int    `json:"waiting_count"` // NOT IN DATABASE
 }
 
 type CuttedImageState uint32
