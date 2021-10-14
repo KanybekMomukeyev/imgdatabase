@@ -235,6 +235,14 @@ func (dbM *DbManager) AllCuttedImagesForCompany(companyId uint64) ([]*dbmodels.C
 	return customers, nil
 }
 
+func (dbM *DbManager) StatOfMarkedCuttedImagesForTelegramId(companyId uint64) ([]*dbmodels.CuttedImage, error) {
+	customers, err := dbmodels.StatOfMarkedCuttedImagesForTelegramId(dbM.DB, companyId)
+	if err != nil {
+		return nil, err
+	}
+	return customers, nil
+}
+
 func (dbM *DbManager) CuttedImageForID(ImageID uint64) (*dbmodels.CuttedImage, error) {
 	cuttedImage, err := dbmodels.CuttedImageForID(dbM.DB, ImageID)
 	if err != nil {
