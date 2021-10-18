@@ -302,6 +302,14 @@ func (dbM *DbManager) CuttedImagesForFolder(folderID uint64) ([]*dbmodels.Cutted
 	return cuttedImages, nil
 }
 
+func (dbM *DbManager) CuttedImagesForType(cuttedImageType uint32) ([]*dbmodels.CuttedImage, error) {
+	cuttedImages, err := dbmodels.CuttedImagesForType(dbM.DB, cuttedImageType)
+	if err != nil {
+		return nil, err
+	}
+	return cuttedImages, nil
+}
+
 func (dbM *DbManager) RandomNotTranslatedCuttedImageNOT_IN_ARRAY(imageIDs []uint64) (*dbmodels.CuttedImage, error) {
 	randomCuttedImage, err := dbmodels.RandomNotTranslatedCuttedImageNOT_IN_ARRAY(dbM.DB, imageIDs)
 	if err != nil {

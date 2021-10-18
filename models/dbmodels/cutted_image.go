@@ -287,6 +287,24 @@ func CuttedImagesForFolder(db *sqlx.DB, folderID uint64) ([]*CuttedImage, error)
 	return customers, nil
 }
 
+func CuttedImagesForType(db *sqlx.DB, cuttedImageType uint32) ([]*CuttedImage, error) {
+
+	rows, err := db.Queryx("SELECT "+
+		selectCuttedImageRow+
+		"FROM cutted_images WHERE cutted_image_type=$1 LIMIT 1000000", cuttedImageType)
+
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Warn("")
+		return nil, err
+	}
+
+	customers, err := scanCuttedImageRow(rows)
+	if err != nil {
+		return nil, err
+	}
+	return customers, nil
+}
+
 func RandomNotTranslatedCuttedImageNOT_IN_ARRAY(db *sqlx.DB, imageIDs []uint64) (*CuttedImage, error) {
 
 	if len(imageIDs) > 0 {
