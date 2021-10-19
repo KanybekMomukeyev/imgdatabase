@@ -318,6 +318,14 @@ func (dbM *DbManager) RandomNotTranslatedCuttedImageNOT_IN_ARRAY(imageIDs []uint
 	return randomCuttedImage, nil
 }
 
+func (dbM *DbManager) RandomNotTranslatedCuttedImageNotInArray_TYPE_IS_HANDWRITTEN(imageIDs []uint64) (*dbmodels.CuttedImage, error) {
+	randomCuttedImage, err := dbmodels.RandomNotTranslatedCuttedImageNotInArray_TYPE_IS_HANDWRITTEN(dbM.DB, imageIDs)
+	if err != nil {
+		return nil, err
+	}
+	return randomCuttedImage, nil
+}
+
 func (dbM *DbManager) RandomUnknownType() (*dbmodels.CuttedImage, error) {
 	randomCuttedImage, err := dbmodels.RandomUnknownType(dbM.DB)
 	if err != nil {

@@ -381,6 +381,58 @@ func RandomUnknownType(db *sqlx.DB) (*CuttedImage, error) {
 	}
 }
 
+func RandomNotTranslatedCuttedImageNotInArray_TYPE_IS_HANDWRITTEN(db *sqlx.DB, imageIDs []uint64) (*CuttedImage, error) {
+
+	if len(imageIDs) > 0 {
+		query, args, err := sqlx.In("SELECT "+
+			selectCuttedImageRow+
+			"FROM cutted_images WHERE cutted_image_state=1000 AND cutted_image_type=303030 AND image_id NOT IN (?) ORDER BY RANDOM() LIMIT 1", imageIDs)
+
+		if err != nil {
+			log.WithFields(log.Fields{"error": err}).Warn("ERROR")
+			return nil, err
+		}
+
+		query = sqlx.Rebind(sqlx.DOLLAR, query) // only if postgres
+		rows, err := db.Queryx(query, args...)
+		if err != nil {
+			log.WithFields(log.Fields{"error": err}).Warn("ERROR")
+			return nil, err
+		}
+
+		cuttedImages, err := scanCuttedImageRow(rows)
+		if err != nil {
+			log.WithFields(log.Fields{"error": err}).Warn("ERROR")
+			return nil, err
+		}
+
+		if len(cuttedImages) > 0 {
+			return cuttedImages[len(cuttedImages)-1], nil
+		} else {
+			return nil, errors.New("EMPTY")
+		}
+	} else {
+		rows, err := db.Queryx("SELECT "+
+			selectCuttedImageRow+
+			"FROM cutted_images WHERE cutted_image_state=$1 AND cutted_image_type=$2 ORDER BY RANDOM() LIMIT 1", uint32(CUTTED_IMAGE_NOT_TRANSLATED), uint32(TYPE_CUTTED_IMAGE_HANDWRITTEN))
+
+		if err != nil {
+			log.WithFields(log.Fields{"error": err}).Warn("")
+			return nil, err
+		}
+		cuttedImages, err := scanCuttedImageRow(rows)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(cuttedImages) > 0 {
+			return cuttedImages[len(cuttedImages)-1], nil
+		} else {
+			return nil, nil
+		}
+	}
+}
+
 func AllUpdatedCuttedImages(db *sqlx.DB, custFilter *ImageFilter, companyId uint64) ([]*CuttedImage, error) {
 
 	rows, err := db.Queryx("SELECT "+
