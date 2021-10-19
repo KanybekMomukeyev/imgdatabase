@@ -205,9 +205,9 @@ func AllCuttedImagesForCompany(db *sqlx.DB, companyId uint64) ([]*CuttedImage, e
 	return customers, nil
 }
 
-func StatOfMarkedCuttedImagesForTelegramId(db *sqlx.DB, companyId uint64) ([]*CuttedImage, error) {
+func StatOfMarkedCuttedImagesForTelegramId(db *sqlx.DB, companyId uint64, cuttedImageType uint32) ([]*CuttedImage, error) {
 
-	rows, err := db.Queryx("SELECT image_id FROM cutted_images WHERE company_id=$1", companyId)
+	rows, err := db.Queryx("SELECT image_id FROM cutted_images WHERE company_id=$1 AND cutted_image_type=$2", companyId, cuttedImageType)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warn("")
 		return nil, err
