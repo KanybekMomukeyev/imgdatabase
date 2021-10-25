@@ -140,9 +140,13 @@ func UpdateTelegramUser(tx *sqlx.Tx, telegramUser *TelegramUser) (uint64, error)
 
 func AllTelegramUsersForCompany(db *sqlx.DB, companyID uint64) ([]*TelegramUser, error) {
 
-	rows, err := db.Queryx("SELECT "+
-		selectTelegramUserRow+
-		"FROM telegram_users WHERE company_id=$1 ORDER BY tegram_account ASC", companyID)
+	rows, err := db.Queryx("SELECT " +
+		selectTelegramUserRow +
+		"FROM telegram_users ORDER BY updated_at ASC")
+
+	// rows, err := db.Queryx("SELECT "+
+	// 	selectTelegramUserRow+
+	// 	"FROM telegram_users WHERE company_id=$1 ORDER BY tegram_account ASC", companyID)
 
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warn("")
