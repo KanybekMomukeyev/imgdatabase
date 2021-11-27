@@ -489,6 +489,14 @@ func (dbM *DbManager) Translated_STATUSES_forTgUser(telegramUserID uint64, trans
 	return translates, nil
 }
 
+func (dbM *DbManager) LastActivityForTgUser(telegramUserID uint64) (*dbmodels.CuttedImageTranslate, error) {
+	lastTranslate, err := dbmodels.LastActivityForTgUser(dbM.DB, telegramUserID)
+	if err != nil {
+		return nil, err
+	}
+	return lastTranslate, nil
+}
+
 func (dbM *DbManager) Count_WAITING_TranslatesForCuttedImage(cuttedImageID uint64) (int, error) {
 
 	translateCount, err := dbmodels.Count_WAITING_TranslatesForCuttedImage(dbM.DB, cuttedImageID, dbmodels.TRANSLATE_WAITING)

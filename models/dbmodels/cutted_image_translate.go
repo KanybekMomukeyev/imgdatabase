@@ -208,6 +208,26 @@ func Translated_STATUSES_forTgUser(db *sqlx.DB, telegramUserID uint64, translate
 	return translates, nil
 }
 
+func LastActivityForTgUser(db *sqlx.DB, telegramUserID uint64) (*CuttedImageTranslate, error) {
+	rows, err := db.Queryx("SELECT "+
+		selectCuttedImageTranslateRow+
+		"FROM cutted_image_translates WHERE telegram_user_id=$1 ORDER BY updated_at DESC LIMIT 1", telegramUserID, 300)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Warn("")
+		return nil, err
+	}
+	translates, err := scanCuttedImageTranslateRow(rows)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(translates) > 0 {
+		return translates[len(translates)-1], nil
+	} else {
+		return nil, nil
+	}
+}
+
 // const (
 // 	TRANSLATE_ACCEPTED AcceptStatus = 1000
 // 	TRANSLATE_WAITING  AcceptStatus = 5000
