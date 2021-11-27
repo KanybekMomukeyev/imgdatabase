@@ -211,7 +211,7 @@ func Translated_STATUSES_forTgUser(db *sqlx.DB, telegramUserID uint64, translate
 func LastActivityForTgUser(db *sqlx.DB, telegramUserID uint64) (*CuttedImageTranslate, error) {
 	rows, err := db.Queryx("SELECT "+
 		selectCuttedImageTranslateRow+
-		"FROM cutted_image_translates WHERE telegram_user_id=$1 ORDER BY updated_at DESC LIMIT 1", telegramUserID, 300)
+		"FROM cutted_image_translates WHERE telegram_user_id=$1 ORDER BY updated_at DESC LIMIT 1", telegramUserID)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warn("")
 		return nil, err
