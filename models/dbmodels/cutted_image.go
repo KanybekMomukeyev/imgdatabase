@@ -247,6 +247,16 @@ func StatsCuttedImageForDoc(db *sqlx.DB, docModelID uint64, cuttedImageState Cut
 	return stateCount, nil
 }
 
+func StatsCuttedImageForTgUser(db *sqlx.DB, companyID uint64) (int, error) {
+	var stateCount int
+	err := db.Get(&stateCount, "SELECT count(*) FROM cutted_images WHERE company_id=$1", companyID)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Warn("")
+		return 0, err
+	}
+	return stateCount, nil
+}
+
 func CuttedImageForID(db *sqlx.DB, ImageID uint64) (*CuttedImage, error) {
 
 	rows, err := db.Queryx("SELECT "+

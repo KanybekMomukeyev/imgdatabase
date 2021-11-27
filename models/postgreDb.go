@@ -292,6 +292,14 @@ func (dbM *DbManager) Cutted_image_marked_as_invalid_FOR(docModelID uint64) (int
 	return translateCount, nil
 }
 
+func (dbM *DbManager) StatsCuttedImageForTgUser(companyID uint64) (int, error) {
+	userMarksCount, err := dbmodels.StatsCuttedImageForTgUser(dbM.DB, companyID)
+	if err != nil {
+		return 0, err
+	}
+	return userMarksCount, nil
+}
+
 // ------------------------------------------------------------ //
 
 func (dbM *DbManager) CuttedImagesForFolder(folderID uint64) ([]*dbmodels.CuttedImage, error) {
