@@ -57,7 +57,7 @@ func TestCreateCuttedImageTranslate(t *testing.T) {
 	respAffected, _ := DbMng.AutoMigrateTranslates()
 	assert.Equal(t, uint64(1000), respAffected, "respAffected")
 
-	translates, err := DbMng.TranslatesForSearchKeyword("Wor")
+	translates, err := DbMng.AutoTranslatesForSearchKeyword("Wor")
 	fmt.Printf("\n\n len(translates): %d \n\n", len(translates))
 	assert.NotEqual(t, 0, len(translates), "translates.count should not be equal to zero")
 	//
@@ -97,7 +97,7 @@ func TestUpdateCuttedImageTranslate(t *testing.T) {
 		assert.Equal(t, cuttedImageTranslate.UserID, uint64(7898673234), "UserID")
 	}
 
-	translates, err := DbMng.TranslatesForSearchKeyword("Wor")
+	translates, err := DbMng.AutoTranslatesForSearchKeyword("Wor")
 	fmt.Printf("\n\n len(translates): %d \n\n", len(translates))
 	assert.NotEqual(t, 0, len(translates), "translates.count should not be equal to zero")
 
