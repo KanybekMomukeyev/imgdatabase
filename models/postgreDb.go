@@ -432,8 +432,16 @@ func (dbM *DbManager) AllUpdatedSuppliers(suppFilter *dbmodels.FolderFilter, com
 }
 
 //---------------------------------- Cutted_Image_Translates -------------------------------------------
-func (dbM *DbManager) TranslatesForSearchKeyword(searchKey string) ([]*dbmodels.CuttedImageTranslate, error) {
-	translates, err := dbmodels.TranslatesForSearchKeyword(dbM.DB, searchKey)
+func (dbM *DbManager) AutoTranslatesForSearchKeyword(searchKey string) ([]*dbmodels.CuttedImageTranslate, error) {
+	translates, err := dbmodels.AutoTranslatesForSearchKeyword(dbM.DB, searchKey)
+	if err != nil {
+		return nil, err
+	}
+	return translates, nil
+}
+
+func (dbM *DbManager) FixedTranslatesForFirstSearchKeyword(firstSearchWord string) ([]*dbmodels.CuttedImageTranslate, error) {
+	translates, err := dbmodels.FixedTranslatesForFirstSearchKeyword(dbM.DB, firstSearchWord)
 	if err != nil {
 		return nil, err
 	}

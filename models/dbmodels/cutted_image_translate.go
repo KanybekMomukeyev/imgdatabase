@@ -22,7 +22,8 @@ type CuttedImageTranslate struct {
 	Summary                string `db:"summary" json:"summary"`
 	AcceptStatus           uint32 `db:"accept_status" json:"accept_status"`
 	UserID                 uint64 `db:"user_id" json:"user_id"`
-	UpdatedAt              uint64 `db:"updated_at"  json:"updated_at"`
+	// TSV                    tsvector `db:"tsv" json:"tsv"`
+	UpdatedAt uint64 `db:"updated_at"  json:"updated_at"`
 }
 
 type DocIDsSelectResponse struct {
@@ -512,7 +513,7 @@ func AllUpdatedCuttedImageTranslatesForImage(db *sqlx.DB, custFilter *CuttedImag
 	return customers, nil
 }
 
-func TranslatesForSearchKeyword(db *sqlx.DB, searchKey string) ([]*CuttedImageTranslate, error) {
+func AutoTranslatesForSearchKeyword(db *sqlx.DB, searchKey string) ([]*CuttedImageTranslate, error) {
 	// # SELECT fieldNames FROM tableName WHERE to_tsvector(fieldName) @@ to_tsquery(conditions)
 
 	lowerCased := strings.ToLower(searchKey)
@@ -523,6 +524,27 @@ func TranslatesForSearchKeyword(db *sqlx.DB, searchKey string) ([]*CuttedImageTr
 	rows, err := db.Queryx("SELECT "+
 		selectCuttedImageTranslateRow+
 		"FROM cutted_image_translates WHERE tsv @@ to_tsquery($1) LIMIT 100", likePatternAfter)
+
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Warn("")
+		return nil, err
+	}
+
+	translates, err := scanCuttedImageTranslateRow(rows)
+	if err != nil {
+		return nil, err
+	}
+	return translates, nil
+}
+
+func FixedTranslatesForFirstSearchKeyword(db *sqlx.DB, firstSearchWord string) ([]*CuttedImageTranslate, error) {
+
+	lowerCased := strings.ToLower(firstSearchWord)
+	likePatternAfter := fmt.Sprintf("%s:*", lowerCased)
+
+	rows, err := db.Queryx("SELECT "+
+		selectCuttedImageTranslateRow+
+		"FROM cutted_image_translates WHERE tsv @@ to_tsquery($1)", likePatternAfter)
 
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warn("")
