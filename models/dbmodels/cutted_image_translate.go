@@ -22,8 +22,12 @@ type CuttedImageTranslate struct {
 	Summary                string `db:"summary" json:"summary"`
 	AcceptStatus           uint32 `db:"accept_status" json:"accept_status"`
 	UserID                 uint64 `db:"user_id" json:"user_id"`
-	// TSV                    tsvector `db:"tsv" json:"tsv"`
+	// TSV                 tsvector `db:"tsv" json:"tsv"`
 	UpdatedAt uint64 `db:"updated_at"  json:"updated_at"`
+}
+
+func (translate CuttedImageTranslate) LowercasedTranslatedWord() string {
+	return strings.ToLower(translate.TranslatedWord)
 }
 
 type DocIDsSelectResponse struct {
