@@ -611,6 +611,14 @@ func (dbM *DbManager) TranslatesForDocModelAndTelegramUser(docModelID uint64, te
 	return custTranslates, nil
 }
 
+func (dbM *DbManager) PagedTransaltesForFilter(translateFilter *dbmodels.TranslateFilterRequest) ([]*dbmodels.CuttedImageTranslate, error) {
+	translates, err := dbmodels.PagedTransaltesForFilter(dbM.DB, translateFilter, 0)
+	if err != nil {
+		return nil, err
+	}
+	return translates, nil
+}
+
 func (dbM *DbManager) TelegramUserIdsDocModel(docModelID uint64) ([]*dbmodels.TelegramUserIDsSelectResponse, error) {
 	telegramIDs, err := dbmodels.TelegramUserIdsDocModel(dbM.DB, docModelID)
 	if err != nil {

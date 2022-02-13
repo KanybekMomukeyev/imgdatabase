@@ -13,6 +13,11 @@ type CuttedImageTranslateFilter struct {
 	CuttedImageTranslatedUpdatedAt uint64 `protobuf:"varint,2,opt,name=customerUpdatedAt,proto3" json:"customerUpdatedAt"`
 }
 
+type TranslateFilterRequest struct {
+	LastTranslateDate uint64
+	Limit             uint32
+}
+
 type CuttedImageTranslate struct {
 	CuttedImageTranslateID uint64 `db:"cutted_image_translate_id"  json:"cutted_image_translate_id"`
 	CuttedImageID          uint64 `db:"cutted_image_id" json:"cutted_image_id"`
@@ -492,6 +497,26 @@ func CuttedImageTranslatesFor(db *sqlx.DB, cuttedImageID uint64) ([]*CuttedImage
 	}
 
 	return customers, nil
+}
+
+func PagedTransaltesForFilter(db *sqlx.DB, translateFilter *TranslateFilterRequest, companyId uint64) ([]*CuttedImageTranslate, error) {
+
+	rows, err := db.Queryx("SELECT "+
+		selectCuttedImageTranslateRow+
+		"FROM cutted_image_translates WHERE updated_at < $1 ORDER BY updated_at DESC LIMIT $2", translateFilter.LastTranslateDate, translateFilter.Limit)
+
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Warn("ERROR")
+		return nil, err
+	}
+
+	translates, err := scanCuttedImageTranslateRow(rows)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Warn("ERROR")
+		return nil, err
+	}
+
+	return translates, nil
 }
 
 func AllUpdatedCuttedImageTranslatesForImage(db *sqlx.DB, custFilter *CuttedImageTranslateFilter, cuttedImageID uint64) ([]*CuttedImageTranslate, error) {

@@ -65,6 +65,15 @@ func TestCreateCuttedImageTranslate(t *testing.T) {
 	assert.Nil(t, err, "error should be nil")
 	if assert.NotNil(t, cuttedImageTranslates) {
 	}
+
+	// --------
+	filter := new(dbmodels.TranslateFilterRequest)
+	filter.Limit = 10
+	filter.LastTranslateDate = dbmodels.UpdatedAt()
+	filteredTranslates, err := DbMng.PagedTransaltesForFilter(filter)
+	assert.Nil(t, err, "error should be nil")
+	assert.NotEqual(t, 0, len(filteredTranslates), "filteredTranslates not zero")
+	fmt.Printf("\n\n len(filteredTranslates): %d \n\n", len(translates))
 }
 
 func TestUpdateCuttedImageTranslate(t *testing.T) {
